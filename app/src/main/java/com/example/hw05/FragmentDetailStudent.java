@@ -1,6 +1,7 @@
 package com.example.hw05;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,12 +21,11 @@ public class FragmentDetailStudent extends Fragment {
     private TextView txtDiem;
     private TextView txtHoTen;
     private TextView txtLop;
-    private Button btnFirst;
-    private Button btnPrevious;
-    private Button btnNext;
-    private Button btnLast;
+    private static Button btnFirst;
+    private static Button btnPrevious;
+    private static Button btnNext;
+    private static Button btnLast;
     private ListView listView;
-    private int index; // index cua item trong list view vua moi dc click
 
     @Nullable
     @Override
@@ -44,24 +44,34 @@ public class FragmentDetailStudent extends Fragment {
         btnPrevious = (Button) view.findViewById(R.id.btnPrevious);
 
         listView = FragmentListStudent.listView;
-        index = FragmentListStudent.index;
 
         btnFirst.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                index = 0;
-                setDataStudent(index);
+                FragmentListStudent.index = 0;
+                FragmentListStudent.setItemClickAtIndex(FragmentListStudent.index);
+                setEnabledButton(FragmentListStudent.index);
             }
         });
 
         btnNext.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (index == listView.getCount() - 1){
-                    Toast.makeText(getActivity(), "Đã đến cuối danh sách", Toast.LENGTH_SHORT).show();
-                } else {
-                    index++;
-                    setDataStudent(index);
+                if (FragmentListStudent.index != listView.getCount() - 1) {
+                    FragmentListStudent.index++;
+                    FragmentListStudent.setItemClickAtIndex(FragmentListStudent.index);
+                    setEnabledButton(FragmentListStudent.index);
+                }
+            }
+        });
+
+        btnPrevious.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (FragmentListStudent.index != 0) {
+                    FragmentListStudent.index--;
+                    FragmentListStudent.setItemClickAtIndex(FragmentListStudent.index);
+                    setEnabledButton(FragmentListStudent.index);
                 }
             }
         });
@@ -69,28 +79,36 @@ public class FragmentDetailStudent extends Fragment {
         btnLast.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                index = listView.getCount() - 1;
-                setDataStudent(index);
-            }
-        });
-
-        btnPrevious.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (index == 0){
-                    Toast.makeText(getActivity(), "Đã về đầu danh sách", Toast.LENGTH_SHORT).show();
-                } else {
-                    index--;
-                    setDataStudent(index);
-                }
+                FragmentListStudent.index = listView.getCount() - 1;
+                FragmentListStudent.setItemClickAtIndex(FragmentListStudent.index);
+                setEnabledButton(FragmentListStudent.index);
             }
         });
 
         return view;
     }
 
+    public static void setEnabledButton(int index) {
+        if (index == 0) {
+            btnFirst.setEnabled(false);
+            btnPrevious.setEnabled(false);
+            btnNext.setEnabled(true);
+            btnLast.setEnabled(true);
+        } else if (index == FragmentListStudent.listView.getCount() - 1) {
+            btnLast.setEnabled(false);
+            btnNext.setEnabled(false);
+            btnFirst.setEnabled(true);
+            btnPrevious.setEnabled(true);
+        } else {
+            btnPrevious.setEnabled(true);
+            btnNext.setEnabled(true);
+            btnFirst.setEnabled(true);
+            btnLast.setEnabled(true);
+        }
+    }
+
     // set data cua sinh vien tai vi tri index trong list view
-    public void setDataStudent(int index) {
+    private void setDataStudent(int index) {
         Student student = (Student) listView.getItemAtPosition(index);
         txtID.setText(student.getID());
         txtHoTen.setText("Họ tên: " + student.getName());

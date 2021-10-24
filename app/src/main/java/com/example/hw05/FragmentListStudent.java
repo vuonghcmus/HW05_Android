@@ -6,24 +6,27 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 
 public class FragmentListStudent extends Fragment {
     public static ListView listView;
-    public static int index; // index cua item vua moi  click
-    private TextView txtMsg;
+    public static int index = -1; // index cua item vua moi  click
+    private static TextView txtMsg;
     private ArrayList<Student> studentList = new ArrayList<>();
     private View view;
 
-    private ISendDataListener iSendDataListener;
+    private static ISendDataListener iSendDataListener;
 
     public interface ISendDataListener {
         void sendDataStudent(Student student);
@@ -46,21 +49,33 @@ public class FragmentListStudent extends Fragment {
         studentList.add(new Student("Thảo Vy", "19120729", "avatar1"));
 
         CustomListAdapter customListAdapter = new CustomListAdapter(getActivity(), studentList);
-//        txtMsg.setText("" + customListAdapter.s);
         listView.setAdapter(customListAdapter);
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 index = i;
-                Object obj = listView.getItemAtPosition(i);
-                Student student = (Student) obj;
-                txtMsg.setText("ID: " + student.getID());
-                iSendDataListener.sendDataStudent(student);
+                Log.e("Index = ", index + "");
+                setItemClickAtIndex(i);
+                FragmentDetailStudent.setEnabledButton(index);
             }
         });
 
         return view;
+    }
+
+    public static void setItemClickAtIndex(int index) {
+        Object obj = listView.getItemAtPosition(index);
+        Student student = (Student) obj;
+        txtMsg.setText("ID: " + student.getID());
+        iSendDataListener.sendDataStudent(student);
+        for (int j = 0; j < listView.getChildCount(); j++) {
+            if (j == index) {
+                listView.getChildAt(j).setBackgroundColor(Color.parseColor("#27CAD0"));
+            } else {
+                listView.getChildAt(j).setBackgroundColor(Color.WHITE);
+            }
+        }
     }
 
     @Override
